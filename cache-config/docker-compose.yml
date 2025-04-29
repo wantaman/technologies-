@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  hazelcast1:
+    container_name: hazelcast1
+    image: hazelcast/hazelcast:latest
+    environment:
+      - HZ_CLUSTERNAME=project-practicum
+      - HZ_USERCODEDEPLOYMENT_ENABLED=true
+      - JAVA_TOOL_OPTIONS=-Xmx256m
+    mem_limit: 2073741824
+    ports:
+      - "5701:5701"
+    networks:
+      - hazelcast
+
+  hazelcast2:
+    container_name: hazelcast2
+    image: hazelcast/hazelcast:latest
+    environment:
+      - HZ_CLUSTERNAME=project-practicum
+      - HZ_USERCODEDEPLOYMENT_ENABLED=true
+      - JAVA_TOOL_OPTIONS=-Xmx256m
+    mem_limit: 2073741824
+    ports:
+      - "5702:5701"
+    networks:
+      - hazelcast
+
+  hazelcast-management:
+    container_name: hazelcast-mc
+    image: hazelcast/management-center:latest
+    ports:
+      - "8099:8080"
+    environment:
+      - MC_DEFAULT_CLUSTER=project-practicum
+      - MC_DEFAULT_CLUSTER_MEMBERS=hazelcast1,hazelcast2
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m
+    
+    networks:
+      - hazelcast
+
+networks:
+  hazelcast:
+    external: true  
+  

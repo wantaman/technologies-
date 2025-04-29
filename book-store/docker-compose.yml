@@ -1,0 +1,40 @@
+services:
+  app:
+    image: registry.gitlab.com/project-practicum1/book-store:latest
+    container_name: book-store
+    restart: on-failure
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: book_store
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${AWS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      AWS_BUCKET: file-book-store
+      AWS_DEFAULT_REGION: ap-southeast-2
+      ELASTICSEARCH_URLS: ${ELASTICSEARCH_URLS}
+      ELASTICSEARCH_API_KEY: ${ELASTICSEARCH_API_KEY}
+      PREFIX_INDEX: elastic-book-store-v1
+      ELASTICSEARCH_CERT: ca.crt
+    volumes:
+      - ./elastic/ca.crt:/var/www/storage/elastic/ca.crt
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        php artisan config:clear  && php artisan config:cache &&
+        php artisan migrate:refresh --seed &&
+        php artisan key:generate &&
+        php artisan passport:install &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+    mem_limit: 2g
+    ports:
+      - '8000:8000'
+    networks:
+      - server-157
+networks:
+  server-157:
+    external: true

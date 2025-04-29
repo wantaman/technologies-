@@ -1,0 +1,30 @@
+{
+    "optionProducts": [
+      {
+        "sizes": [
+          {
+            "id": 8,
+            "value": "M",
+            "status": true
+          },
+          {
+            "id": 9,
+            "value": "L",
+            "status": true
+          }
+        ],
+        "colors": [
+          {
+            "id": 6,
+            "value": "red",
+            "status": true
+          },
+          {
+            "id": 7,
+            "value": "blue",
+            "status": true
+          }
+        ]
+      }
+    ]
+  }

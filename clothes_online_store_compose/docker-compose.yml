@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  app:
+    image: registry.gitlab.com/project-practicum1/loar-tinh:dev
+    container_name: clothes-online-store
+    labels:
+      - "com.centurylinklabs.watchowner.enable=true"
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: 96.9.77.143
+      DB_PORT: 3306
+      DB_DATABASE: loar_tinh
+      DB_USERNAME: root
+      DB_PASSWORD: backend157
+      ACCESS_KEY: AKIAZI2LHJAZQRMNMEVQ
+      FILE: file-loar-tinh
+      PASSWORD_MAIL: idvwgafyizyuvtmx
+      POINT_URL: https://file-loar-tinh.s3.ap-southeast-2.amazonaws.com
+      SECRET_KEY: PWLExSkPWulSxFhecXwnow1zBNkZfppnGOLoK2hq
+      USERNAME_MAIL: longlong3578@gmail.com
+    ports:
+      - '9001:9001'
+    networks:
+      - server-157
+networks:
+  server-157:
+    external: true
+  
