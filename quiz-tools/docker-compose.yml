@@ -1,0 +1,31 @@
+services:
+  mongo_container:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: long
+      MONGO_INITDB_ROOT_PASSWORD: long123
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - quiz_sys
+  redis:
+    image: redis:8-alpine
+    container_name: redis_service
+    ports: 
+     - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=libra123
+    volumes:
+      - cache_rd:/data/cache
+    networks:
+      - quiz_sys
+  
+volumes:
+  mongodb_data:
+  cache_rd:
+
+networks:
+  quiz_sys:
+    driver: bridge 

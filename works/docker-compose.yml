@@ -1,0 +1,89 @@
+services:
+  # We do Dubbu based SOA Architecture  , here is we talking about some tools that using : zookeeper , oracle, mongoDB , redis and kubernet
+  # we also use tool for handling data analytic like : druid analytic
+  
+  # zookeeper
+  #zookeeper:
+  # image: zookeeper:3.8
+  # container_name: zookeeper
+  # hostname: zookeeper  
+  # ports:
+  #   - "2181:2181"
+    
+  # environment:
+  #   ZOO_MY_ID: 1
+  #   ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+  #   ZOO_4LW_COMMANDS_WHITELIST: "*" 
+  # volumes:
+  #   - zk-data:/data
+  #   - zk-logs:/datalog 
+  # healthcheck:
+  #   test: ["CMD-SHELL", "zkServer.sh status"]
+  #   interval: 10s
+  #   timeout: 5s
+  #   retries: 3
+  # deploy:
+  #   resources:
+  #     limits:
+  #       memory: 1g
+  # networks:
+  #   - dubbo_soa       
+
+  # oracle:
+  oracle_db:
+    container_name: oracle_database
+    image: gvenzl/oracle-xe:21  # more light and easy for configuration , I can not use 21-slim on MAC because it is not support I can only use 21 or 21-full
+    ports: 
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: libra123
+      APP_USER: libra
+      APP_USER_PASSWORD: libra123
+    volumes:
+      - data:/opt/oracle/oradata
+    shm_size: 2g
+    networks:
+      - dubbo_soa
+
+  # mongoDB
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=libra123
+    volumes:
+      - monDB:/data/db
+    networks:
+      - dubbo_soa
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+
+  # redis 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports: 
+     - "6379:6379"
+       #environment:
+       #- REDIS_PASSWORD=libra123
+    volumes:
+      - cache_rd:/data/cache
+    command: ["redis-server" , "--requirepass","libra123"]
+    networks:
+      - dubbo_soa
+
+
+  # kubernet that control all these services in cluster
+
+
+volumes:
+  data: 
+  monDB:
+    #zookee:
+  cache_rd:
+
+networks:
+  dubbo_soa:
+    external: true

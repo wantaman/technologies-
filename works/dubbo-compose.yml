@@ -1,0 +1,95 @@
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27015:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=libra
+      - MONGO_INITDB_ROOT_PASSWORD=libra123
+    volumes:
+      - mon:/data/db
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "-u", "libra", "-p", "libra123", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dubbo_soa
+  mysql:
+    image: mysql:latest
+    ports:
+      - 3308:3306
+    environment: 
+      MYSQL_DATABASE: book_db
+      MYSQL_PASSWORD: nacos123
+      MYSQL_ROOT_PASSWORD: nacos123
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./mysql-schema.sql:/docker-entrypoint-initdb.d/mysql-schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-pnacos123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dubbo_soa
+  redis:
+    image: redis:latest
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    ports: 
+      - "6379:6379"
+    command: redis-server --requirepass libra123
+    volumes:
+      - redis:/data
+    networks:
+      - dubbo_soa
+  nacos:
+   # platform: linux/amd64 # only mac-chip add this line
+    image: nacos/nacos-server:v2.5.1
+    restart: on-failure
+    ports:
+      - "8848:8848" # Web UI
+      - "9848:9848" # gRPC Dubbo 3
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      NACOS_AUTH_TOKEN: "+QQosBE9UbUvpbmo78+3uy+j5yhcl2SsA0C5XnnsjJE=" # openssl rand -base64 32
+      NACOS_AUTH_IDENTITY_KEY: "bk-123"
+      NACOS_AUTH_IDENTITY_VALUE: "8bf3fdbd-2c13-4bfb-b045-4b6806826209" # uuidgen
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: book_db
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: nacos123
+      MYSQL_SERVICE_DB_PARAM: "useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&characterEncoding=utf8&useUnicode=true&serverTimezone=UTC&useLegacyDatetimeCode=false"      
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - dubbo_soa
+
+volumes:
+  mon:
+  mysql:
+  redis:
+
+networks:
+  dubbo_soa: 
+    external: true

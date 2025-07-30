@@ -1,0 +1,13 @@
+services:
+  metabase:
+    image: metabase/metabase:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - dubbo_soa
+networks:
+  dubbo_soa:
+    external: true

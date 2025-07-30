@@ -1,0 +1,27 @@
+services:
+  jenkins:
+    build:
+      context: ./config
+      dockerfile: Dockerfile
+    user: "0:0"
+    container_name: cicd-jenkins
+    restart: unless-stopped
+    ports:
+      - "50000:50000"
+      - "8080:8080"
+    environment:
+      - JENKINS_UID=${JENKINS_UID}
+      - JENKINS_GID=${JENKINS_GID}
+    deploy:
+      resources:
+        limits:
+          memory: 3GB
+    volumes:
+      - ${JENKINS_LOCAL_HOME}:/var/jenkins_home
+      - ${HOST_DOCKER_SOCK}:/var/run/docker.sock
+    networks:
+      - jen
+
+networks:
+  jen:
+    external: true
